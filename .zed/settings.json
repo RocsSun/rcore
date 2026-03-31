@@ -1,0 +1,13 @@
+{
+    "lsp": {
+        "rust-analyzer": {
+            "initialization_options": {
+                "checkOnSave": true,
+                "check": {
+                    "allTargets": false,
+                    "targets": "riscv64gc-unknown-none-elf"
+                }
+            }
+        }
+    }
+}
