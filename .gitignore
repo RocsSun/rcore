@@ -1,6 +1,13 @@
 .idea/
-.vsode/
-.zed/
+.vscode/*
+.zed/*
 
-/target
+!.vscode/settings.json
+!.zed/settings.json
+
+**/target/
 Cargo.lock
+
+**/.DS_Store
+**/*.swp
+**/*.swo
