@@ -5,6 +5,38 @@
 //! 
 
 #![no_std]
+#![feature(linkage)]
+
+use crate::syscall::sys_exit;
 
 mod abi;
 pub mod syscall;
+
+
+#[unsafe(no_mangle)]
+fn rust_start() -> ! {
+    clear_bss();
+    sys_exit(main());
+    panic!("unreachable after sys_exit!");
+}
+
+/// 兜底
+#[linkage = "weak"]
+#[unsafe(no_mangle)]
+fn main() -> i32 {
+    panic!("Cannot find main!");
+}
+
+#[allow(function_casts_as_integer)]
+fn clear_bss() {
+    unsafe extern "C" {
+        safe fn start_bss();
+        safe fn end_bss();
+    }
+
+    (start_bss as usize .. end_bss as usize).for_each(|x| {
+        unsafe  {
+            (x as *mut u8).write_volatile(0);
+        }
+    });
+}
