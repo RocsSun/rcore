@@ -10,10 +10,12 @@
 mod abi;
 #[macro_use]
 mod console;
+mod lang_items;
 mod syscall;
 
 pub use syscall::*;
 
+/// U模式入口函数
 #[unsafe(no_mangle)]
 fn rust_start() -> ! {
     clear_bss();
