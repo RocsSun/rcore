@@ -19,7 +19,7 @@ fn rust_start() -> ! {
     panic!("unreachable after sys_exit!");
 }
 
-/// 兜底
+/// 兜底，用户程序没有main的时候，链接此函数
 #[linkage = "weak"]
 #[unsafe(no_mangle)]
 fn main() -> i32 {
