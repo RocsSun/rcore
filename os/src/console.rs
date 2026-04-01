@@ -20,13 +20,13 @@ pub fn print(arg: Arguments) {
 #[macro_export]
 macro_rules! print {
     ($ff: literal $(, $($arg: tt)+)?) => {
-        $crate::console::print(format_args!(ff $(, $($arg)+)?));
+        $crate::console::print(format_args!(ff $(, $($arg)+)?))
     };
 }
 
 #[macro_export]
 macro_rules! println {
     ($ff: literal $(, $($arg: tt)+)?) => {
-        $crate::console::print(format_args!(concat!($ff, "\n") $(, $($arg)+)?));
+        $crate::console::print(format_args!(concat!($ff, "\n") $(, $($arg)+)?))
     };
 }
