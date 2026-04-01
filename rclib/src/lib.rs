@@ -8,6 +8,8 @@
 #![feature(linkage)]
 
 mod abi;
+#[macro_use]
+mod console;
 mod syscall;
 
 pub use syscall::*;
