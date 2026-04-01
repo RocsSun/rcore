@@ -7,7 +7,7 @@ BASE_ADDRESS = 0x80400000;
 
 SECTIONS
 {
-    . = BASE_ADDRESS
+    . = BASE_ADDRESS;
     .text : {
         *(.text.entry)
         *(.text .text.*)
@@ -27,7 +27,7 @@ SECTIONS
         start_bss = . ;
         *(.bss .bss.*)
         *(.sbss .sbss.*)
-        end_bss = , ;
+        end_bss = . ;
     }
 
     /DISCARD/ : {
