@@ -1,22 +1,21 @@
 //!
 //! rclib
-//! 
+//!
 //! rcore os 的lib库，提供os调用接口。
-//! 
+//!
 
 #![no_std]
 #![feature(linkage)]
 
-use crate::syscall::sys_exit;
-
 mod abi;
-pub mod syscall;
+mod syscall;
 
+pub use syscall::*;
 
 #[unsafe(no_mangle)]
 fn rust_start() -> ! {
     clear_bss();
-    sys_exit(main());
+    exit(main());
     panic!("unreachable after sys_exit!");
 }
 
@@ -34,9 +33,7 @@ fn clear_bss() {
         safe fn end_bss();
     }
 
-    (start_bss as usize .. end_bss as usize).for_each(|x| {
-        unsafe  {
-            (x as *mut u8).write_volatile(0);
-        }
+    (start_bss as usize..end_bss as usize).for_each(|x| unsafe {
+        (x as *mut u8).write_volatile(0);
     });
 }
