@@ -1,0 +1,3 @@
+[submodule "rcore-os/riscv"]
+	path = rcore-os/riscv
+	url = https://github.com/rcore-os/riscv
