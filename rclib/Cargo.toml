@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-riscv ={ path = "../rcore-os/riscv", features = ["inline-asm"] }
+riscv ={ git = "https://https://github.com/rcore-os/riscv", features = ["inline-asm"] }
