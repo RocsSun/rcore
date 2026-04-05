@@ -13,11 +13,15 @@ pub mod console;
 mod lang_items;
 mod syscall;
 
+use core::arch::global_asm;
+
 pub use syscall::*;
+
+global_asm!(include_str!("entry.asm"));
 
 /// U模式入口函数
 #[unsafe(no_mangle)]
-fn rust_start() -> ! {
+fn rust_lib_start() -> ! {
     clear_bss();
     exit(main());
     panic!("unreachable after sys_exit!");

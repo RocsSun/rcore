@@ -1,5 +1,5 @@
     .section .text.entry
-    .globl _start
+    .globl lib_start
 
-_start:
-    call rust_start
+lib_start:
+    call rust_lib_start

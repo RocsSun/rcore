@@ -1,7 +1,7 @@
 #! 此linker文件针对用户的程序，做bss段清零使用。
 
 OUTPUT_ARCH(riscv)
-ENTRY(_start)
+ENTRY(lib_start)
 
 BASE_ADDRESS = 0x80400000;
 
