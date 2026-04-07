@@ -6,6 +6,7 @@ mod console;
 mod lang_items;
 mod logging;
 mod sbi;
+mod sync;
 
 use core::arch::global_asm;
 
