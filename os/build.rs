@@ -13,12 +13,14 @@ fn main() {
 }
 
 fn insert_app_data() -> Result<()> {
-    let mut f =File::create(LINK_APP)?;
-    let mut apps = read_dir(APP_DIR)?.into_iter().map(|x| {
-        let mut app_name_with_ext = x.unwrap().file_name().into_string().unwrap();
-        app_name_with_ext.drain(app_name_with_ext.find(".").unwrap()..app_name_with_ext.len());
-        app_name_with_ext
-    }).collect::<Vec<_>>();
+    let mut f = File::create(LINK_APP)?;
+    let mut apps = read_dir(APP_DIR)?
+        .map(|x| {
+            let mut app_name_with_ext = x.unwrap().file_name().into_string().unwrap();
+            app_name_with_ext.drain(app_name_with_ext.find(".").unwrap()..app_name_with_ext.len());
+            app_name_with_ext
+        })
+        .collect::<Vec<_>>();
     apps.sort();
 
     // .align 3按照8字节对齐
@@ -31,24 +33,29 @@ fn insert_app_data() -> Result<()> {
     .globl _name_app
 _name_app:
     .quad {}"#,
-    apps.len()
+        apps.len()
     )?;
 
     for i in 0..apps.len() {
         writeln!(f, r#"    .quad app_{}_start"#, i)?;
     }
-    writeln!(f, r#"    .quad app_{}_end"#, apps.len()-1)?;
+    // 将app_{apps.len()-1)}_end的地址写入此处，8B的空间，正好是64位的地址空间。
+    writeln!(f, r#"    .quad app_{}_end"#, apps.len() - 1)?;
 
+    // .incbin 是 GNU 汇编器的一个伪指令，用于将二进制文件的内容直接嵌入到当前汇编位置。
     apps.into_iter().enumerate().for_each(|(i, v)| {
         writeln!(
-            f, r#"
+            f,
+            r#"
     .section .data
     .globl app_{0}_start
     .globl app_{0}_end
 app_{0}_start:
     .incbin {2}/{1}.bin
 app_{0}_end"#,
-    i, v, TARGET_PATH).unwrap();
+            i, v, TARGET_PATH
+        )
+        .unwrap();
     });
     Ok(())
 }
