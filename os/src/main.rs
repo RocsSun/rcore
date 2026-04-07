@@ -3,6 +3,7 @@
 
 #[macro_use]
 mod console;
+mod batch;
 mod lang_items;
 mod logging;
 mod sbi;
