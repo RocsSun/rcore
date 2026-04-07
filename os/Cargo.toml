@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+lazy_static = { version = "1.5.0", features = ["spin_no_std"] }
 log = "0.4.29"
 sbi-rt = { version = "0.0.3", features = ["legacy"] }
