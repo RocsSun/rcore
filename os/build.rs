@@ -22,7 +22,7 @@ fn insert_app_data() -> Result<()> {
     apps.sort();
 
     // .align 3按照8字节对齐
-    // .quad 是 GNU 汇编器（GAS） 的一个伪指令，用于定义 8 字节（64 位）的数据。
+    // .quad 是 GNU 汇编器（GAS） 的一个伪指令，用于在内存中开辟8字节的空间，将后边的内容存入里面。
     writeln!(
         f,
         r#"
@@ -35,9 +35,9 @@ _name_app:
     )?;
 
     for i in 0..apps.len() {
-        writeln!(f, r#".   .quad app_{}_start"#, i)?;
+        writeln!(f, r#"    .quad app_{}_start"#, i)?;
     }
-    writeln!(f, r#".   .quad app_{}_end"#, apps.len()-1)?;
+    writeln!(f, r#"    .quad app_{}_end"#, apps.len()-1)?;
 
     apps.into_iter().enumerate().for_each(|(i, v)| {
         writeln!(
