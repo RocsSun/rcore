@@ -15,7 +15,7 @@ use core::arch::global_asm;
 
 use log::debug;
 
-use crate::{logging::init, sbi::shutdown};
+use crate::logging::init;
 
 global_asm!(include_str!("entry.asm"));
 
