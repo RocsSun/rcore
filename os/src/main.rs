@@ -8,6 +8,7 @@ mod lang_items;
 mod logging;
 mod sbi;
 mod sync;
+mod syscall;
 
 use core::arch::global_asm;
 
