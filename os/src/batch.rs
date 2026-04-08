@@ -2,9 +2,11 @@ use core::arch::asm;
 
 use lazy_static::lazy_static;
 
-use crate::sync::up::RcUpSafeCell;
+use crate::{sync::up::RcUpSafeCell, trap::context::TrapContext};
 
 const MAX_APP_NUM: usize = 16;
+// const USER_STACK_SIZE: usize = 4096 * 2;
+const KERNEL_STACK_SIZE: usize = 4096 * 2;
 const APP_START_ADDRESS: usize = 0x80400000;
 const APP_SIZE_LIMIT: usize = 0x20000;
 
@@ -72,6 +74,56 @@ impl AppManager {
     }
 }
 
+/// 内核栈，用于管理内科态的调用栈，
+///
+/// 这里是保存用户态`ecall`之后寄存器的状态保存
+/// 设置4字节对齐
+struct KernelStack {
+    data: [u8; KERNEL_STACK_SIZE],
+}
+
+impl KernelStack {
+    // 获取栈顶。
+    fn get_sp(&self) -> usize {
+        self.data.as_ptr() as usize + KERNEL_STACK_SIZE
+    }
+
+    pub fn push_context(&self, ctx: TrapContext) -> &'static mut TrapContext {
+        // 这里是计算TrapContext 的内存占用，需要从当前栈顶向下开多少的栈空间
+        let ctx_ptr = (self.get_sp() - core::mem::size_of::<TrapContext>()) as *mut TrapContext;
+
+        unsafe {
+            // 写数据，裸指针
+            *ctx_ptr = ctx;
+
+            ctx_ptr.as_mut().unwrap()
+        }
+    }
+}
+
+// /// 用户栈，用于管理用户态的调用栈，
+// ///
+// /// 这里是保存用户态`ecall`之后寄存器的状态保存
+// /// 设置4字节对齐
+// #[repr(align(4096))]
+// struct UserStack {
+//     data: [u8; KERNEL_STACK_SIZE],
+// }
+
+// impl UserStack {
+//     // 获取栈顶。
+//     fn get_sp(&self) -> usize {
+//         self.data.as_ptr() as usize + USER_STACK_SIZE
+//     }
+// }
+
+static KERTNEL_STACK: KernelStack = KernelStack {
+    data: [0; KERNEL_STACK_SIZE],
+};
+// static USER_STACK: UserStack = UserStack {
+//     data: [0; USER_STACK_SIZE],
+// };
+
 // 这里也是和教程有出入。
 lazy_static! {
     static ref APP_MANAGER: RcUpSafeCell<AppManager> = {
@@ -99,4 +151,26 @@ pub fn init() {
 
 pub fn print_app_info() {
     APP_MANAGER.execute_access().print_app_info();
+}
+
+pub fn run_next_app() -> ! {
+    let mut app_manager = APP_MANAGER.execute_access();
+    let curr_app = app_manager.get_current_app();
+
+    app_manager.load_app(curr_app);
+    app_manager.move_to_next_app();
+    drop(app_manager);
+
+    unsafe extern "C" {
+        unsafe fn __restore(cx_addr: usize);
+    }
+
+    unsafe {
+        __restore(KERTNEL_STACK.push_context(TrapContext::app_init_context(
+            APP_START_ADDRESS,
+            KERTNEL_STACK.get_sp(),
+        )) as *const _ as usize);
+    }
+
+    panic!("[kernel] unreachable in batch::run_current_app!")
 }

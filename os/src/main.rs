@@ -63,7 +63,10 @@ fn rust_main() {
         boot_stack_top as usize, boot_stack_bottom as usize
     );
     println!("Hello, world!");
-    shutdown(true)
+
+    trap::init();
+    batch::init();
+    batch::run_next_app();
 }
 
 /// 因为写的是操作系统的内核，因此，操作系统自己程序的bss段需要自己手动初始化为0，正常操作系统跑的程序由操作系统负责初始化。
